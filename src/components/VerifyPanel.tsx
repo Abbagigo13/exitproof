@@ -9,7 +9,7 @@ type Props = {
 };
 
 type ReceiptResult =
-  | { status: "found"; anchorer: string; timestamp: number; protocolRef: string }
+  | { status: "found"; anchorer: string; timestamp: number; protocolRef: string; revoked: boolean }
   | { status: "not-found" }
   | { status: "idle" }
   | { status: "error"; message: string };
@@ -61,7 +61,7 @@ export function VerifyPanel({ initialHash = "" }: Props) {
     if (isLoading) return { status: "idle" }; // spinner shown separately
     if (isError) return { status: "error", message: error?.message ?? "Unknown error" };
     if (!data) return { status: "idle" };
-    const [anchorer, timestamp, protocolRef] = data as [string, bigint, string];
+    const [anchorer, timestamp, protocolRef, revoked] = data as [string, bigint, string, boolean];
     if (anchorer === "0x0000000000000000000000000000000000000000" || timestamp === 0n) {
       return { status: "not-found" };
     }
@@ -70,6 +70,7 @@ export function VerifyPanel({ initialHash = "" }: Props) {
       anchorer,
       timestamp: Number(timestamp),
       protocolRef,
+      revoked: revoked ?? false,
     };
   })();
 
@@ -97,7 +98,7 @@ export function VerifyPanel({ initialHash = "" }: Props) {
     <div className="flex flex-col gap-4">
       {/* Explainer */}
       <p className="text-xs text-[var(--muted)] text-pretty">
-        Enter a SHA-256 receipt hash to check whether it has been anchored on Arc Testnet. You can paste any hash computed in the Receipt tab.
+        Enter a SHA-256 receipt hash to check whether it has been anchored on Arc. You can paste any hash computed in the Receipt tab.
       </p>
 
       {/* Input */}
@@ -150,12 +151,20 @@ export function VerifyPanel({ initialHash = "" }: Props) {
       {query && !isLoading && (
         <div>
           {result.status === "found" && (
-            <div className="rounded-xl border border-[var(--success)]/30 bg-[var(--success)]/8 p-4 flex flex-col gap-3">
+            <div className={`rounded-xl border p-4 flex flex-col gap-3 ${result.revoked ? "border-[var(--risk-crit)]/30 bg-[var(--risk-crit)]/8" : "border-[var(--success)]/30 bg-[var(--success)]/8"}`}>
               <div className="flex items-center gap-2">
-                <CheckCircle size={16} className="text-[var(--success)] shrink-0" />
-                <span className="text-sm font-semibold text-[var(--success)]">
-                  Receipt found on-chain
+                {result.revoked
+                  ? <XCircle size={16} className="text-[var(--risk-crit)] shrink-0" />
+                  : <CheckCircle size={16} className="text-[var(--success)] shrink-0" />
+                }
+                <span className={`text-sm font-semibold ${result.revoked ? "text-[var(--risk-crit)]" : "text-[var(--success)]"}`}>
+                  {result.revoked ? "Receipt revoked" : "Receipt found on-chain"}
                 </span>
+                {result.revoked && (
+                  <span className="ml-auto text-[10px] bg-[var(--risk-crit)]/15 text-[var(--risk-crit)] border border-[var(--risk-crit)]/25 px-2 py-0.5 rounded-full font-medium">
+                    REVOKED
+                  </span>
+                )}
               </div>
 
               <div className="grid grid-cols-1 gap-2">
@@ -163,6 +172,7 @@ export function VerifyPanel({ initialHash = "" }: Props) {
                 <ResultRow label="Anchored by" value={formatAddress(result.anchorer)} mono />
                 <ResultRow label="Anchored at" value={formatTimestamp(result.timestamp)} />
                 <ResultRow label="Hash" value={`${query.slice(0, 18)}…${query.slice(-8)}`} mono />
+                <ResultRow label="Status" value={result.revoked ? "Revoked by owner" : "Valid"} />
               </div>
 
               <div className="flex flex-wrap gap-2 pt-1">

@@ -22,3 +22,4 @@
 {"level":"debug","message":"[vite] invalidate /src/main.tsx: Could not Fast Refresh (\"true\" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports","timestamp":1792502660772}
 {"level":"debug","message":"[vite] hot updated: /src/main.tsx","timestamp":1792502660772}
 {"level":"debug","message":"[vite] hot updated: /src/index.css","timestamp":1792502660772}
+{"level":"log","message":"[vite] server connection lost. Polling for restart...","timestamp":1792502968232}
