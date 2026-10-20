@@ -89,7 +89,7 @@ export function ReceiptPanel({ protocol, contractAddress, onAnchorRequest }: Pro
                 onClick={() => onAnchorRequest?.(hash)}
                 className="mt-2 text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] underline"
               >
-                Anchor this hash on Arc Testnet
+                Anchor this hash on Arc Mainnet
               </button>
             ) : (
               <p className="mt-2 text-[10px] text-[var(--subtle)]">
