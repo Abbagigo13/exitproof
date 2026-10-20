@@ -161,10 +161,19 @@ export function ProtocolBrowser({ protocols, selectedId, onSelect }: Props) {
       </div>
 
       {/* Protocol list */}
-      <div className="flex flex-col gap-1.5 max-h-[480px] overflow-y-auto pr-1">
+      <div className="flex flex-col gap-1.5 max-h-[560px] overflow-y-auto scrollbar-none pr-0.5">
         {filtered.length === 0 ? (
-          <div className="text-sm text-[var(--subtle)] text-center py-8">
-            No protocols match your filters.
+          <div className="flex flex-col items-center gap-2 py-12 text-center">
+            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+              <Search size={16} className="text-[var(--subtle)]" />
+            </div>
+            <p className="text-sm text-[var(--subtle)]">No protocols match your filters.</p>
+            <button
+              onClick={() => { setCategoryFilter("All"); setChainFilter("All"); setRiskFilter("All"); setSearch(""); }}
+              className="text-xs text-[var(--accent)] hover:underline"
+            >
+              Clear all filters
+            </button>
           </div>
         ) : (
           filtered.map(p => {
@@ -175,25 +184,32 @@ export function ProtocolBrowser({ protocols, selectedId, onSelect }: Props) {
               <button
                 key={p.id}
                 onClick={() => onSelect(p.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all hover:border-white/20 ${
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl border text-left transition-all hover:border-white/20 active:scale-[0.99] overflow-hidden relative ${
                   isActive
                     ? "bg-[var(--accent)]/10 border-[var(--accent)]/30"
                     : "bg-white/3 border-white/6 hover:bg-white/5"
                 }`}
               >
+                {/* Risk colour left strip */}
+                <div className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-xl" style={{ background: color }} />
+
                 {/* Risk gauge */}
-                <div className="shrink-0">
+                <div className="shrink-0 pl-1">
                   <RiskGauge score={score} size="sm" />
                 </div>
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-[var(--ink-2)] truncate">{p.name}</span>
-                    <span className={`text-[10px] font-medium tabular-nums ${color}`}>{score}</span>
+                    <span className="text-[10px] font-bold tabular-nums" style={{ color }}>{score}</span>
                   </div>
-                  <div className="text-[11px] text-[var(--subtle)] truncate mt-0.5">
-                    {p.category} · {p.chain} · TVL {p.tvl}
+                  <div className="text-[10px] text-[var(--subtle)] truncate mt-0.5 flex gap-1.5">
+                    <span>{p.category}</span>
+                    <span className="opacity-40">·</span>
+                    <span>{p.chain}</span>
+                    <span className="opacity-40">·</span>
+                    <span className="tabular-nums">{p.tvl}</span>
                   </div>
                 </div>
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Shield, Search, BarChart3, Layers, FlaskConical, FileJson, ArrowUpRight, RefreshCw, Wifi, WifiOff, BadgeCheck, ArrowLeft, type LucideIcon } from "lucide-react";
+import { Shield, Search, BarChart3, Layers, FlaskConical, FileJson, ArrowUpRight, RefreshCw, Wifi, WifiOff, BadgeCheck, ArrowLeft, type LucideIcon, Activity } from "lucide-react";
+import { useAccount } from "wagmi";
 import { ConnectKitButton } from "connectkit";
 import { computeComposite, evidenceCoverage, riskLabel, WEIGHTS } from "./data/protocols";
 import type { Protocol } from "./data/protocols";
@@ -43,6 +44,7 @@ const initialSharedReceipt = getReceiptFromUrl();
 
 export default function App() {
   const { protocols, loading, error, source, fetchedAt, refresh } = useProtocols();
+  const { isConnected, chainId } = useAccount();
   const [selectedId, setSelectedId] = useState<string | null>(urlProtocolId);
   // "browse" shows the full protocol browser; "detail" shows the selected protocol
   const [view, setView] = useState<"browse" | "detail">(urlProtocolId ? "detail" : "browse");
@@ -78,37 +80,65 @@ export default function App() {
   const activeId = selectedId ?? protocols[0]?.id ?? "";
   const protocol = protocols.find(p => p.id === activeId) ?? protocols[0];
 
-  // While loading the first time, protocol may be undefined
+  // Skeleton loading state
   if (loading && !protocol) {
     return (
-      <div className="min-h-dvh flex items-center justify-center" style={{ background: "var(--bg-gradient)" }}>
-        <div className="flex flex-col items-center gap-3">
-          <RefreshCw size={24} className="text-[var(--accent)] animate-spin" />
-          <p className="text-sm text-[var(--muted)]">Fetching live protocol data…</p>
-        </div>
+      <div className="min-h-dvh flex flex-col" style={{ background: "var(--bg-gradient)" }}>
+        <header className="border-b border-white/8 sticky top-0 z-30 bg-[#0d1b2f]/80 backdrop-blur-sm">
+          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-[var(--accent)]/20 border border-[var(--accent)]/30 flex items-center justify-center">
+                <Shield size={14} className="text-[var(--accent)]" />
+              </div>
+              <span className="display font-bold text-[var(--ink)] text-base tracking-tight">ExitProof</span>
+            </div>
+            <ConnectKitButton />
+          </div>
+        </header>
+        <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6 flex flex-col gap-4">
+          <div className="skeleton h-9 w-full rounded-xl" />
+          <div className="skeleton h-10 w-48 rounded-xl" />
+          <div className="grid grid-cols-1 gap-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="skeleton h-24 w-full rounded-2xl" />
+            ))}
+          </div>
+        </main>
       </div>
     );
   }
 
   const composite = computeComposite(protocol.scores);
   const coverage = evidenceCoverage(protocol.evidence);
-  const { label: _riskLabelStr, color: _riskColor } = riskLabel(composite);
+  const { label: riskLabelStr, color: riskColor } = riskLabel(composite);
+  void riskLabelStr; void riskColor;
 
   return (
     <div className="min-h-dvh flex flex-col" style={{ background: "var(--bg-gradient)" }}>
       {/* Top bar */}
-      <header className="border-b border-white/8 backdrop-blur-sm sticky top-0 z-30 bg-[#0d1b2f]/80">
+      <header className="border-b border-white/8 backdrop-blur-sm sticky top-0 z-30 bg-[#0d1b2f]/90">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-[var(--accent)]/20 border border-[var(--accent)]/30 flex items-center justify-center">
-              <Shield size={14} className="text-[var(--accent)]" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[var(--accent)]/30 to-[var(--accent)]/10 border border-[var(--accent)]/30 flex items-center justify-center shadow-sm">
+              <Shield size={15} className="text-[var(--accent)]" />
             </div>
-            <span className="display font-bold text-[var(--ink)] text-base tracking-tight">
-              ExitProof
-            </span>
-            <span className="hidden sm:block text-xs text-[var(--subtle)] border border-white/10 px-2 py-0.5 rounded-full">
-              DeFi Risk Intelligence
-            </span>
+            <div className="flex flex-col leading-none">
+              <span className="display font-bold text-[var(--ink)] text-base tracking-tight">ExitProof</span>
+              <span className="text-[10px] text-[var(--subtle)] tracking-wide hidden sm:block">DeFi Risk Intelligence</span>
+            </div>
+            {/* Network pill */}
+            {isConnected && (
+              <span className={`hidden sm:flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border font-medium ${
+                chainId === 5042
+                  ? "bg-[var(--success)]/10 border-[var(--success)]/30 text-[var(--success)]"
+                  : chainId === 5042002
+                  ? "bg-yellow-400/10 border-yellow-400/30 text-yellow-400"
+                  : "bg-[var(--danger)]/10 border-[var(--danger)]/30 text-[var(--danger)]"
+              }`}>
+                <Activity size={8} />
+                {chainId === 5042 ? "Arc Mainnet" : chainId === 5042002 ? "Arc Testnet" : "Wrong network"}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <ConnectKitButton />
@@ -227,20 +257,20 @@ export default function App() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-none bg-white/4 rounded-2xl p-1 border border-white/8">
           {TABS.map(t => {
             const Icon = t.icon;
             return (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all shrink-0 ${
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
                   tab === t.id
-                    ? "bg-[var(--accent)]/15 text-[var(--accent)] border border-[var(--accent)]/30"
-                    : "text-[var(--subtle)] hover:text-[var(--muted)] hover:bg-white/5 border border-transparent"
+                    ? "bg-[var(--accent)]/20 text-[var(--accent)] shadow-sm ring-1 ring-[var(--accent)]/25"
+                    : "text-[var(--subtle)] hover:text-[var(--muted)] hover:bg-white/5"
                 }`}
               >
-                <Icon size={13} />
+                <Icon size={12} />
                 {t.label}
               </button>
             );
@@ -263,7 +293,7 @@ export default function App() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <StatCard label="Category" value={protocol.category} />
                 <StatCard label="Chain" value={protocol.chain} />
-                <StatCard label="TVL" value={protocol.tvl} />
+                <StatCard label="TVL" value={protocol.tvl} accent />
                 <StatCard label="Last checked" value={protocol.lastChecked} />
               </div>
 
@@ -387,28 +417,36 @@ export default function App() {
 
         {/* Comparison strip */}
         <div>
-          <div className="text-xs text-[var(--subtle)] uppercase tracking-wider mb-3">
-            Protocol comparison
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-xs text-[var(--subtle)] uppercase tracking-wider font-semibold">
+              Protocol comparison
+            </div>
+            <span className="text-[10px] text-[var(--subtle)]">Top 6 by TVL</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {protocols.slice(0, 6).map(p => {
               const c = computeComposite(p.scores);
-              const { color: _color } = riskLabel(c);
+              const { color } = riskLabel(c);
               const isActive = p.id === activeId;
               return (
                 <button
                   key={p.id}
                   onClick={() => selectProtocol(p.id)}
-                  className={`rounded-xl border p-4 text-left transition-all hover:border-white/20 ${
+                  className={`rounded-xl border p-4 text-left transition-all hover:border-white/20 active:scale-[0.98] overflow-hidden relative ${
                     isActive ? "border-[var(--accent)]/40 bg-[var(--accent)]/8" : "border-white/8 bg-white/4"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <span className="text-sm font-semibold text-[var(--ink-2)]">{p.name}</span>
+                  {/* Risk colour left strip */}
+                  <div className="absolute left-0 top-0 bottom-0 w-0.5 rounded-l-xl" style={{ background: color }} />
+                  <div className="flex items-start justify-between gap-2 mb-2 pl-2">
+                    <span className="text-sm font-semibold text-[var(--ink-2)] leading-tight">{p.name}</span>
                     <RiskGauge score={c} size="sm" />
                   </div>
-                  <div className="text-xs text-[var(--subtle)]">{p.category}</div>
-                  <div className="text-xs text-[var(--subtle)]">TVL {p.tvl}</div>
+                  <div className="text-[10px] text-[var(--subtle)] pl-2 flex gap-2">
+                    <span>{p.category}</span>
+                    <span>·</span>
+                    <span className="tabular-nums">{p.tvl}</span>
+                  </div>
                 </button>
               );
             })}
@@ -416,19 +454,25 @@ export default function App() {
         </div>
 
         {/* Footer */}
-        <footer className="text-center text-[10px] text-[var(--subtle)] py-4 border-t border-white/5">
-          ExitProof prototype · {source === "live" ? "Protocol data from DefiLlama" : "Illustrative protocol data"} · Risk scores algorithmically derived · Not financial advice · Built on Arc Testnet
+        <footer className="text-center text-[10px] text-[var(--subtle)] py-6 border-t border-white/5 flex flex-col gap-1.5">
+          <p className="font-medium text-[var(--muted)]">ExitProof — DeFi Risk Intelligence</p>
+          <p>{source === "live" ? "Protocol data sourced live from DefiLlama" : "Illustrative protocol data"} · Risk scores algorithmically derived</p>
+          <p>Smart contract on <a href="https://explorer.arc.io/address/0xcd8E285b61437EE0AfDdbD5EBA54c1A3ea6FBFb6" target="_blank" rel="noreferrer" className="text-[var(--accent)] hover:underline">Arc Mainnet</a> · Not financial advice · Not a security audit</p>
         </footer>
       </main>
     </div>
   );
 }
 
-function StatCard({ label, value }: { label: string; value: string }) {
+function StatCard({ label, value, accent = false }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="rounded-lg border border-white/8 bg-white/4 px-3 py-2.5">
-      <div className="text-[10px] text-[var(--subtle)] uppercase tracking-wider mb-0.5">{label}</div>
-      <div className="text-sm font-semibold text-[var(--ink-2)] tabular-nums">{value}</div>
+    <div className={`rounded-xl border px-3 py-3 flex flex-col gap-1 transition-colors ${
+      accent
+        ? "border-[var(--accent)]/25 bg-[var(--accent)]/8"
+        : "border-white/8 bg-white/4 hover:bg-white/6"
+    }`}>
+      <div className="text-[9px] text-[var(--subtle)] uppercase tracking-widest font-semibold">{label}</div>
+      <div className="text-sm font-bold text-[var(--ink-2)] tabular-nums leading-tight">{value}</div>
     </div>
   );
 }

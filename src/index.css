@@ -42,6 +42,33 @@ body {
   font-family: 'JetBrains Mono', Menlo, monospace;
 }
 
+/* Risk colour tokens */
+:root {
+  --risk-low:  #8dd89f;
+  --risk-mod:  #f0c040;
+  --risk-elev: #f59e42;
+  --risk-crit: #e86d7a;
+}
+
+/* Hide scrollbar but keep scrollability */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 0.5rem;
+}
+
 /* Sonner toast overrides */
 [data-sonner-toaster] {
   font-family: 'DM Sans', sans-serif !important;

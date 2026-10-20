@@ -27,7 +27,7 @@ const TREASURY = "0x5B12Ce46C7194aD57d143bC22847224047b1Ef42" as const;
 
 const usdcFact = getUsdc(TARGET_CHAIN_ID);
 const USDC_ADDRESS = usdcFact?.address as `0x${string}`;
-const PREMIUM_AMOUNT = "1"; // 1 USDC
+const PREMIUM_AMOUNT = "0.1"; // 0.1 USDC
 
 type Props = {
   protocolId: string;
@@ -105,7 +105,7 @@ export function PremiumGate({ protocolId, protocolName, featureLabel, children }
             {featureLabel}
           </h3>
           <p className="text-xs text-[var(--muted)] max-w-xs">
-            Unlock premium access for <span className="font-semibold text-[var(--ink-2)]">{protocolName}</span> for a one-time payment of <span className="font-semibold text-[var(--accent)]">1 USDC</span> on {TARGET_CHAIN_ID === 5042 ? "Arc Mainnet" : "Arc Testnet"}.
+            Unlock premium access for <span className="font-semibold text-[var(--ink-2)]">{protocolName}</span> for a one-time payment of <span className="font-semibold text-[var(--accent)]">0.1 USDC</span> on {TARGET_CHAIN_ID === 5042 ? "Arc Mainnet" : "Arc Testnet"}.
           </p>
         </div>
 
@@ -166,7 +166,7 @@ export function PremiumGate({ protocolId, protocolName, featureLabel, children }
             {isPending ? (
               <><Loader size={14} className="animate-spin" /> Awaiting signature…</>
             ) : (
-              <><Coins size={14} /> Pay 1 USDC to unlock</>
+              <><Coins size={14} /> Pay 0.1 USDC to unlock</>
             )}
           </button>
         )}
