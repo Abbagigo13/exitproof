@@ -18,11 +18,11 @@ import { toast } from "sonner";
 import { getUsdc, buildTxExplorerUrl } from "@/onchain-facts";
 import { parseAmount } from "@/onchain-money";
 import { usePremiumAccess } from "../hooks/usePremiumAccess";
+import { REGISTRY_CHAIN_ID } from "../lib/registry";
 
-// Arc Testnet
-const TARGET_CHAIN_ID = 5042002;
+const TARGET_CHAIN_ID = REGISTRY_CHAIN_ID;
 
-// Treasury: platform deployer wallet (testnet demo)
+// Treasury: platform deployer wallet — replace with your multisig on mainnet
 const TREASURY = "0x5B12Ce46C7194aD57d143bC22847224047b1Ef42" as const;
 
 const usdcFact = getUsdc(TARGET_CHAIN_ID);
@@ -105,7 +105,7 @@ export function PremiumGate({ protocolId, protocolName, featureLabel, children }
             {featureLabel}
           </h3>
           <p className="text-xs text-[var(--muted)] max-w-xs">
-            Unlock premium access for <span className="font-semibold text-[var(--ink-2)]">{protocolName}</span> for a one-time payment of <span className="font-semibold text-[var(--accent)]">1 USDC</span> on Arc Testnet.
+            Unlock premium access for <span className="font-semibold text-[var(--ink-2)]">{protocolName}</span> for a one-time payment of <span className="font-semibold text-[var(--accent)]">1 USDC</span> on {TARGET_CHAIN_ID === 5042 ? "Arc Mainnet" : "Arc Testnet"}.
           </p>
         </div>
 
@@ -135,7 +135,7 @@ export function PremiumGate({ protocolId, protocolName, featureLabel, children }
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-yellow-400/15 border border-yellow-400/30 text-yellow-400 text-sm font-semibold hover:bg-yellow-400/25 transition-all disabled:opacity-50"
           >
             {isSwitching ? <Loader size={14} className="animate-spin" /> : null}
-            Switch to Arc Testnet
+            Switch to {TARGET_CHAIN_ID === 5042 ? "Arc Mainnet" : "Arc Testnet"}
           </button>
         ) : isSuccess && txHash ? (
           <div className="flex flex-col items-center gap-2">
@@ -171,9 +171,11 @@ export function PremiumGate({ protocolId, protocolName, featureLabel, children }
           </button>
         )}
 
-        <p className="text-[9px] text-[var(--subtle)]">
-          Testnet demo — no real funds. Get test USDC from the sidebar.
-        </p>
+        {TARGET_CHAIN_ID !== 5042 && (
+          <p className="text-[9px] text-[var(--subtle)]">
+            Testnet demo — no real funds. Get test USDC from the sidebar.
+          </p>
+        )}
       </div>
     </div>
   );

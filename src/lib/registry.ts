@@ -1,9 +1,28 @@
 /**
  * Shared constants for the RiskReceiptRegistry contract.
  * Import from here — never inline the address or ABI elsewhere.
+ *
+ * Set VITE_REGISTRY_ADDRESS in .env to override the default address.
+ * Set VITE_USE_MAINNET=true to point at Arc Mainnet.
  */
 
-export const REGISTRY_ADDRESS = "0xf9394055a418cf0cf606c11c928d992bb1c55536" as const satisfies `0x${string}`;
+const isMainnet = import.meta.env.VITE_USE_MAINNET === 'true';
+
+// Testnet address (deployed by Arc Studio)
+const TESTNET_ADDRESS = "0xf9394055a418cf0cf606c11c928d992bb1c55536" as const satisfies `0x${string}`;
+
+// Mainnet address — set via VITE_REGISTRY_ADDRESS after you deploy
+const MAINNET_ADDRESS = (import.meta.env.VITE_REGISTRY_ADDRESS ?? "") as `0x${string}`;
+
+export const REGISTRY_ADDRESS: `0x${string}` = isMainnet
+  ? MAINNET_ADDRESS
+  : TESTNET_ADDRESS;
+
+export const REGISTRY_CHAIN_ID: number = isMainnet ? 5042 : 5042002;
+
+export const REGISTRY_EXPLORER: string = isMainnet
+  ? "https://explorer.arc.io"
+  : "https://explorer.testnet.arc.io";
 
 export const REGISTRY_ABI = [
   {
@@ -35,5 +54,3 @@ export const REGISTRY_ABI = [
     outputs: [{ name: "", type: "bool" }],
   },
 ] as const;
-
-export const REGISTRY_EXPLORER = "https://explorer.testnet.arc.io";
