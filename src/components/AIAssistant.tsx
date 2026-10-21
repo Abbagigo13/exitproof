@@ -143,8 +143,8 @@ export function AIAssistant() {
       {/* Floating button */}
       <button
         onClick={() => setOpen(o => !o)}
-        className="fixed bottom-6 right-6 z-50 w-13 h-13 rounded-2xl bg-[var(--accent)]/90 border border-[var(--accent)] shadow-xl shadow-[var(--accent)]/25 flex items-center justify-center hover:bg-[var(--accent)] transition-all active:scale-95"
-        style={{ width: 52, height: 52 }}
+        className="fixed bottom-6 right-6 rounded-2xl bg-[var(--accent)]/90 border border-[var(--accent)] shadow-xl shadow-[var(--accent)]/25 flex items-center justify-center hover:bg-[var(--accent)] transition-all active:scale-95"
+        style={{ width: 52, height: 52, zIndex: 10001 }}
         aria-label="Open AI assistant"
       >
         {open ? <ChevronDown size={20} className="text-[var(--bg)]" /> : <Sparkles size={20} className="text-[var(--bg)]" />}
@@ -152,8 +152,8 @@ export function AIAssistant() {
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-24 right-6 z-50 w-[min(360px,calc(100vw-2rem))] rounded-2xl border border-white/12 bg-[#0d1b2f]/96 backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden"
-          style={{ maxHeight: "70vh" }}>
+        <div className="fixed bottom-24 right-6 w-[min(360px,calc(100vw-2rem))] rounded-2xl border border-white/12 bg-[#0d1b2f]/96 backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden"
+          style={{ maxHeight: "70vh", zIndex: 10001 }}>
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/8 shrink-0">
             <div className="flex items-center gap-2">

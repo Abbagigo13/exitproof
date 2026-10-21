@@ -160,12 +160,12 @@ export function ProtocolBrowser({ protocols, selectedId, onSelect }: Props) {
         <SortIndicator sort={sort} />
       </div>
 
-      {/* Protocol list */}
-      <div className="flex flex-col gap-1.5 max-h-[560px] overflow-y-auto scrollbar-none pr-0.5">
+      {/* Protocol card grid */}
+      <div className="max-h-[680px] overflow-y-auto scrollbar-none pr-0.5">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 py-12 text-center">
-            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-              <Search size={16} className="text-[var(--subtle)]" />
+          <div className="flex flex-col items-center gap-2 py-16 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+              <Search size={18} className="text-[var(--subtle)]" />
             </div>
             <p className="text-sm text-[var(--subtle)]">No protocols match your filters.</p>
             <button
@@ -176,48 +176,47 @@ export function ProtocolBrowser({ protocols, selectedId, onSelect }: Props) {
             </button>
           </div>
         ) : (
-          filtered.map(p => {
-            const score = computeComposite(p.scores);
-            const { color } = riskLabel(score);
-            const isActive = p.id === selectedId;
-            return (
-              <button
-                key={p.id}
-                onClick={() => onSelect(p.id)}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl border text-left transition-all hover:border-white/20 active:scale-[0.99] overflow-hidden relative ${
-                  isActive
-                    ? "bg-[var(--accent)]/10 border-[var(--accent)]/30"
-                    : "bg-white/3 border-white/6 hover:bg-white/5"
-                }`}
-              >
-                {/* Risk colour left strip */}
-                <div className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-xl" style={{ background: color }} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {filtered.map(p => {
+              const score = computeComposite(p.scores);
+              const { color } = riskLabel(score);
+              const isActive = p.id === selectedId;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => onSelect(p.id)}
+                  className={`flex flex-col gap-3 p-4 rounded-2xl border text-left transition-all hover:border-white/25 active:scale-[0.98] overflow-hidden relative ${
+                    isActive
+                      ? "bg-[var(--accent)]/10 border-[var(--accent)]/35 shadow-sm shadow-[var(--accent)]/10"
+                      : "bg-white/4 border-white/8 hover:bg-white/6"
+                  }`}
+                >
+                  {/* Risk colour top strip */}
+                  <div className="absolute left-0 top-0 right-0 h-[3px] rounded-t-2xl" style={{ background: color }} />
 
-                {/* Risk gauge */}
-                <div className="shrink-0 pl-1">
-                  <RiskGauge score={score} size="sm" />
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-[var(--ink-2)] truncate">{p.name}</span>
-                    <span className="text-[10px] font-bold tabular-nums" style={{ color }}>{score}</span>
+                  {/* Top row: name + gauge */}
+                  <div className="flex items-start justify-between gap-2 pt-1">
+                    <span className="text-sm font-bold text-[var(--ink-2)] leading-snug line-clamp-2">{p.name}</span>
+                    <div className="shrink-0">
+                      <RiskGauge score={score} size="sm" />
+                    </div>
                   </div>
-                  <div className="text-[10px] text-[var(--subtle)] truncate mt-0.5 flex gap-1.5">
-                    <span>{p.category}</span>
-                    <span className="opacity-40">·</span>
-                    <span>{p.chain}</span>
-                    <span className="opacity-40">·</span>
-                    <span className="tabular-nums">{p.tvl}</span>
-                  </div>
-                </div>
 
-                {/* Risk band pill */}
-                <RiskPill score={score} />
-              </button>
-            );
-          })
+                  {/* Meta row */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] text-[var(--subtle)] bg-white/5 border border-white/8 rounded-md px-1.5 py-0.5">{p.category}</span>
+                    <span className="text-[10px] text-[var(--subtle)] bg-white/5 border border-white/8 rounded-md px-1.5 py-0.5">{p.chain}</span>
+                  </div>
+
+                  {/* Bottom row: TVL + risk pill */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-[var(--ink)] tabular-nums">{p.tvl}</span>
+                    <RiskPill score={score} />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>

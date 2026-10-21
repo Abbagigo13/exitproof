@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, BarChart3, Layers, FlaskConical, FileJson, ArrowUpRight, RefreshCw, Wifi, WifiOff, BadgeCheck, ArrowLeft, type LucideIcon } from "lucide-react";
 import { useAccount } from "wagmi";
-import { computeComposite, evidenceCoverage, riskLabel, WEIGHTS } from "../data/protocols";
+import { computeComposite, evidenceCoverage, WEIGHTS } from "../data/protocols";
 import type { Protocol } from "../data/protocols";
 import { useProtocols } from "../hooks/useProtocols";
 import { RiskGauge } from "../components/RiskGauge";
@@ -99,8 +99,6 @@ export default function DashboardPage() {
 
   const composite = computeComposite(protocol.scores);
   const coverage = evidenceCoverage(protocol.evidence);
-  const { label: riskLabelStr, color: riskColor } = riskLabel(composite);
-  void riskLabelStr; void riskColor;
 
   return (
     <AppShell>
@@ -372,44 +370,6 @@ export default function DashboardPage() {
         </div>
 
         </>}
-
-        {/* Comparison strip */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-xs text-[var(--subtle)] uppercase tracking-wider font-semibold">
-              Protocol comparison
-            </div>
-            <span className="text-[10px] text-[var(--subtle)]">Top 6 by TVL</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {protocols.slice(0, 6).map(p => {
-              const c = computeComposite(p.scores);
-              const { color } = riskLabel(c);
-              const isActive = p.id === activeId;
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => selectProtocol(p.id)}
-                  className={`rounded-xl border p-4 text-left transition-all hover:border-white/20 active:scale-[0.98] overflow-hidden relative ${
-                    isActive ? "border-[var(--accent)]/40 bg-[var(--accent)]/8" : "border-white/8 bg-white/4"
-                  }`}
-                >
-                  {/* Risk colour left strip */}
-                  <div className="absolute left-0 top-0 bottom-0 w-0.5 rounded-l-xl" style={{ background: color }} />
-                  <div className="flex items-start justify-between gap-2 mb-2 pl-2">
-                    <span className="text-sm font-semibold text-[var(--ink-2)] leading-tight">{p.name}</span>
-                    <RiskGauge score={c} size="sm" />
-                  </div>
-                  <div className="text-[10px] text-[var(--subtle)] pl-2 flex gap-2">
-                    <span>{p.category}</span>
-                    <span>·</span>
-                    <span className="tabular-nums">{p.tvl}</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
         {/* Footer */}
         <footer className="text-center text-[10px] text-[var(--subtle)] py-6 border-t border-white/5 flex flex-col gap-1.5">
