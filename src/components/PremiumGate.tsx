@@ -4,7 +4,7 @@
  * Once the transaction is confirmed, the content is revealed and access is
  * persisted in localStorage for this wallet + protocol combination.
  */
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Lock, Unlock, Loader, ExternalLink, BadgeCheck, Coins } from "lucide-react";
 import {
   useAccount,
@@ -19,6 +19,8 @@ import { getUsdc, buildTxExplorerUrl } from "@/onchain-facts";
 import { parseAmount } from "@/onchain-money";
 import { usePremiumAccess } from "../hooks/usePremiumAccess";
 import { REGISTRY_CHAIN_ID } from "../lib/registry";
+import { useGasEstimate } from "../hooks/useGasEstimate";
+import { GasPill } from "./GasPill";
 
 const TARGET_CHAIN_ID = REGISTRY_CHAIN_ID;
 
@@ -39,6 +41,11 @@ type Props = {
 export function PremiumGate({ protocolId, protocolName, featureLabel, children }: Props) {
   const { isConnected, chainId, address } = useAccount();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
+
+  const gasTarget = useMemo(() => address
+    ? { type: "premium" as const, from: address }
+    : null, [address]);
+  const gas = useGasEstimate(isConnected ? gasTarget : null);
   const { hasAccess, grantAccess } = usePremiumAccess(protocolId);
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
 
@@ -158,17 +165,20 @@ export function PremiumGate({ protocolId, protocolName, featureLabel, children }
             Confirming payment…
           </div>
         ) : (
-          <button
-            onClick={handlePay}
-            disabled={isPending || !USDC_ADDRESS}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[var(--accent)] text-sm font-semibold hover:bg-[var(--accent)]/25 transition-all disabled:opacity-50 active:scale-95"
-          >
-            {isPending ? (
-              <><Loader size={14} className="animate-spin" /> Awaiting signature…</>
-            ) : (
-              <><Coins size={14} /> Pay 0.1 USDC to unlock</>
-            )}
-          </button>
+          <div className="flex flex-col items-center gap-1.5">
+            <button
+              onClick={handlePay}
+              disabled={isPending || !USDC_ADDRESS}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[var(--accent)] text-sm font-semibold hover:bg-[var(--accent)]/25 transition-all disabled:opacity-50 active:scale-95"
+            >
+              {isPending ? (
+                <><Loader size={14} className="animate-spin" /> Awaiting signature…</>
+              ) : (
+                <><Coins size={14} /> Pay 0.1 USDC to unlock</>
+              )}
+            </button>
+            <GasPill display={gas.display} loading={gas.loading} error={gas.error} />
+          </div>
         )}
 
         {TARGET_CHAIN_ID !== 5042 && (

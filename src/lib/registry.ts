@@ -104,4 +104,24 @@ export const REGISTRY_ABI = [
     inputs: [],
     outputs: [],
   },
+  // Events
+  {
+    name: "ReceiptAnchored",
+    type: "event",
+    inputs: [
+      { name: "anchorer", type: "address", indexed: true },
+      { name: "receiptHash", type: "bytes32", indexed: true },
+      { name: "protocolRef", type: "string", indexed: false },
+      { name: "timestamp", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    name: "ReceiptRevoked",
+    type: "event",
+    inputs: [
+      { name: "anchorer", type: "address", indexed: true },
+      { name: "receiptHash", type: "bytes32", indexed: true },
+      { name: "reason", type: "string", indexed: false },
+    ],
+  },
 ] as const;

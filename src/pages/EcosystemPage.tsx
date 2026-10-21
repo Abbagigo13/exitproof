@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Zap, Database, TrendingUp, Globe, ExternalLink, RefreshCw, Loader } from "lucide-react";
+import { ArrowLeft, Zap, Database, TrendingUp, Globe, ExternalLink, RefreshCw, Loader, Radio, ShieldCheck, Hash } from "lucide-react";
 import { AppShell } from "../components/AppShell";
+import { useReceiptFeed } from "../hooks/useReceiptFeed";
+import { REGISTRY_EXPLORER, REGISTRY_ADDRESS } from "../lib/registry";
 
 interface ArcStats {
   totalTvl: string;
@@ -70,6 +72,7 @@ const STAT_CARDS = (s: ArcStats) => [
 
 export default function EcosystemPage() {
   const navigate = useNavigate();
+  const feed = useReceiptFeed();
   const [stats, setStats] = useState<ArcStats | null>(null);
   const [protocols, setProtocols] = useState<ArcProtocol[]>([]);
   const [loading, setLoading] = useState(true);
@@ -228,6 +231,116 @@ export default function EcosystemPage() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Live Receipt Feed */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse" />
+              <h2 className="display font-bold text-[var(--ink)] text-base tracking-tight">Live Receipt Feed</h2>
+              {feed.totalOnChain !== null && (
+                <span className="text-[10px] text-[var(--subtle)] bg-white/5 border border-white/8 px-2 py-0.5 rounded-full">
+                  {feed.totalOnChain} total anchors
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {feed.lastBlock !== null && (
+                <span className="text-[10px] text-[var(--subtle)] hidden sm:block">
+                  block #{feed.lastBlock.toString()}
+                </span>
+              )}
+              <button
+                onClick={feed.refresh}
+                disabled={feed.loading}
+                className="flex items-center gap-1 text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] disabled:opacity-40 transition-opacity"
+              >
+                <RefreshCw size={11} className={feed.loading ? "animate-spin" : ""} />
+              </button>
+            </div>
+          </div>
+
+          {feed.error && (
+            <div className="rounded-xl border border-[var(--danger)]/25 bg-[var(--danger)]/8 px-3 py-2 text-xs text-[var(--danger)] mb-3">
+              {feed.error} — retrying every 10s
+            </div>
+          )}
+
+          {feed.loading && feed.events.length === 0 ? (
+            <div className="flex items-center gap-2 text-sm text-[var(--muted)] py-6">
+              <Loader size={14} className="animate-spin text-[var(--accent)]" />
+              Scanning Arc Mainnet for receipt anchors…
+            </div>
+          ) : feed.events.length === 0 ? (
+            <div className="rounded-2xl border border-white/8 bg-white/4 p-8 text-center flex flex-col items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center">
+                <Radio size={18} className="text-[var(--accent)]" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[var(--ink-2)]">Listening for receipts…</p>
+                <p className="text-xs text-[var(--subtle)] mt-0.5">
+                  No anchors found in the last 50,000 blocks. Be the first — anchor a risk receipt from the Dashboard.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {feed.events.map(ev => (
+                <div
+                  key={ev.id}
+                  className="flex items-center gap-3 px-4 py-3.5 rounded-xl border border-white/8 bg-white/4 hover:border-white/12 transition-all"
+                >
+                  <div className="w-8 h-8 rounded-xl bg-[var(--success)]/15 border border-[var(--success)]/25 flex items-center justify-center shrink-0">
+                    <ShieldCheck size={14} className="text-[var(--success)]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-sm font-semibold text-[var(--ink-2)] truncate">
+                        {ev.protocolRef || "Unknown protocol"}
+                      </span>
+                      <span className="text-[10px] text-[var(--success)] bg-[var(--success)]/10 border border-[var(--success)]/20 px-1.5 py-0.5 rounded-full shrink-0">
+                        Anchored
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+                      <span className="font-mono text-[10px] text-[var(--subtle)]">
+                        {ev.anchorer.slice(0, 6)}…{ev.anchorer.slice(-4)}
+                      </span>
+                      <span className="text-[10px] text-[var(--subtle)]">
+                        {new Date(ev.timestamp * 1000).toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" })}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <a
+                      href={`${REGISTRY_EXPLORER}/address/${REGISTRY_ADDRESS}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      title={ev.receiptHash}
+                      className="flex items-center gap-1 text-[10px] text-[var(--accent)] hover:underline"
+                    >
+                      <Hash size={10} />
+                      {ev.receiptHash.slice(0, 8)}…
+                    </a>
+                    {ev.txHash && (
+                      <a
+                        href={`${REGISTRY_EXPLORER}/tx/${ev.txHash}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[var(--subtle)] hover:text-[var(--accent)] transition-colors"
+                      >
+                        <ExternalLink size={12} />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="text-[10px] text-[var(--subtle)] mt-2">
+            Polling Arc Mainnet every 10s · Showing up to 50 events · Contract: <a href={`${REGISTRY_EXPLORER}/address/${REGISTRY_ADDRESS}`} target="_blank" rel="noreferrer" className="text-[var(--accent)] hover:underline font-mono">{REGISTRY_ADDRESS.slice(0, 10)}…</a>
+          </p>
         </div>
 
         {/* ExitProof contract */}

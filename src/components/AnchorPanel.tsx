@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Shield, ExternalLink, CheckCircle, Loader } from "lucide-react";
 import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
 import { toast } from "sonner";
 import { ConnectKitButton } from "connectkit";
 import { REGISTRY_ADDRESS, REGISTRY_ABI, REGISTRY_EXPLORER } from "../lib/registry";
+import { useGasEstimate } from "../hooks/useGasEstimate";
+import { GasPill } from "./GasPill";
 
 type Props = {
   hash: string;
@@ -14,6 +16,13 @@ type Props = {
 export function AnchorPanel({ hash, protocolId, onAnchored }: Props) {
   const { isConnected } = useAccount();
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
+
+  const gasTarget = useMemo(() => ({
+    type: "anchor" as const,
+    hash: hash as `0x${string}`,
+    protocolId,
+  }), [hash, protocolId]);
+  const gas = useGasEstimate(isConnected ? gasTarget : null);
 
   const { writeContract, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -97,23 +106,28 @@ export function AnchorPanel({ hash, protocolId, onAnchored }: Props) {
           </div>
         </div>
       ) : (
-        <button
-          onClick={handleAnchor}
-          disabled={isPending || isConfirming}
-          className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[var(--accent)] text-sm font-semibold hover:bg-[var(--accent)]/25 transition-all disabled:opacity-50 active:scale-95"
-        >
-          {isPending || isConfirming ? (
-            <>
-              <Loader size={14} className="animate-spin" />
-              {isConfirming ? "Confirming…" : "Awaiting signature…"}
-            </>
-          ) : (
-            <>
-              <Shield size={14} />
-              Anchor on Arc Testnet
-            </>
-          )}
-        </button>
+        <div className="flex flex-col gap-1.5">
+          <button
+            onClick={handleAnchor}
+            disabled={isPending || isConfirming}
+            className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[var(--accent)] text-sm font-semibold hover:bg-[var(--accent)]/25 transition-all disabled:opacity-50 active:scale-95"
+          >
+            {isPending || isConfirming ? (
+              <>
+                <Loader size={14} className="animate-spin" />
+                {isConfirming ? "Confirming…" : "Awaiting signature…"}
+              </>
+            ) : (
+              <>
+                <Shield size={14} />
+                Anchor on Arc Mainnet
+              </>
+            )}
+          </button>
+          <div className="flex justify-center">
+            <GasPill display={gas.display} loading={gas.loading} error={gas.error} />
+          </div>
+        </div>
       )}
     </div>
   );

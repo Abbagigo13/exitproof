@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Search, CheckCircle, XCircle, ExternalLink, Loader, ClipboardPaste } from "lucide-react";
 import { useReadContract } from "wagmi";
 import { REGISTRY_ADDRESS, REGISTRY_ABI, REGISTRY_EXPLORER } from "../lib/registry";
+import { useGasEstimate } from "../hooks/useGasEstimate";
+import { GasPill } from "./GasPill";
 
 type Props = {
   /** Pre-populate the input (e.g. after anchoring). */
@@ -34,6 +36,7 @@ export function VerifyPanel({ initialHash = "" }: Props) {
   const [query, setQuery] = useState<`0x${string}` | null>(
     isValidBytes32(initialHash) ? (initialHash) : null
   );
+  const gas = useGasEstimate({ type: "verify" });
 
   // Sync when the parent passes a new initialHash (e.g. just anchored)
   useEffect(() => {
@@ -128,23 +131,29 @@ export function VerifyPanel({ initialHash = "" }: Props) {
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={!inputValid || isLoading}
-          className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[var(--accent)] text-sm font-semibold hover:bg-[var(--accent)]/25 transition-all disabled:opacity-40 active:scale-95"
-        >
-          {isLoading ? (
-            <>
-              <Loader size={14} className="animate-spin" />
-              Querying…
-            </>
-          ) : (
-            <>
-              <Search size={14} />
-              Verify on-chain
-            </>
-          )}
-        </button>
+        <div className="flex flex-col gap-1.5">
+          <button
+            type="submit"
+            disabled={!inputValid || isLoading}
+            className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[var(--accent)] text-sm font-semibold hover:bg-[var(--accent)]/25 transition-all disabled:opacity-40 active:scale-95"
+          >
+            {isLoading ? (
+              <>
+                <Loader size={14} className="animate-spin" />
+                Querying…
+              </>
+            ) : (
+              <>
+                <Search size={14} />
+                Verify on-chain
+              </>
+            )}
+          </button>
+          <div className="flex items-center justify-between px-1">
+            <GasPill display={gas.display} loading={gas.loading} error={gas.error} />
+            <span className="text-[9px] text-[var(--subtle)]">Read-only — no gas required</span>
+          </div>
+        </div>
       </form>
 
       {/* Result */}
