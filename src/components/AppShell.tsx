@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Shield, BarChart3, Globe, GitCompare, Activity, Wallet } from "lucide-react";
+import { Shield, BarChart3, Globe, GitCompare, Activity, Wallet, TrendingUp, Bell } from "lucide-react";
 import { ConnectKitButton } from "connectkit";
 import { useAccount } from "wagmi";
 import { AIAssistant } from "./AIAssistant";
@@ -7,7 +7,9 @@ import { AIAssistant } from "./AIAssistant";
 const NAV = [
   { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
   { path: "/compare", label: "Compare", icon: GitCompare },
-  { path: "/wallet", label: "Wallet Risk", icon: Wallet },
+  { path: "/yield", label: "Yield Risk", icon: TrendingUp },
+  { path: "/wallet", label: "Wallet", icon: Wallet },
+  { path: "/watchlist", label: "Watchlist", icon: Bell },
   { path: "/ecosystem", label: "Arc Ecosystem", icon: Globe },
 ];
 

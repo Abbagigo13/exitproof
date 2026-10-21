@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Download, Hash, AlertCircle, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { buildReceipt, downloadReceipt, hashReceipt } from "../lib/receipt";
+import { computeComposite, riskLabel } from "../data/protocols";
 import type { Protocol } from "../data/protocols";
+import { MintReceiptNFT } from "./MintReceiptNFT";
 
 type Props = {
   protocol: Protocol;
@@ -13,6 +15,8 @@ type Props = {
 export function ReceiptPanel({ protocol, contractAddress, onAnchorRequest }: Props) {
   const [hash, setHash] = useState<string | null>(null);
   const [computing, setComputing] = useState(false);
+  const composite = computeComposite(protocol.scores);
+  const { label: riskLevelStr } = riskLabel(composite);
 
   function handleDownload() {
     const receipt = buildReceipt(protocol);
@@ -99,6 +103,16 @@ export function ReceiptPanel({ protocol, contractAddress, onAnchorRequest }: Pro
           </div>
         )}
       </div>
+
+      {/* Mint as NFT (shown once hash is computed) */}
+      {hash && (
+        <MintReceiptNFT
+          receiptHash={hash}
+          protocolName={protocol.name}
+          riskLevel={riskLevelStr}
+          riskScore={composite}
+        />
+      )}
 
       {/* Disclaimer */}
       <div className="rounded-xl border border-[var(--danger)]/20 bg-[var(--danger)]/5 p-3">
