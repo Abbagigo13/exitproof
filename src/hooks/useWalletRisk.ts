@@ -37,7 +37,7 @@ const TRANSFER_EVENT = parseAbiItem(
   "event Transfer(address indexed from, address indexed to, uint256 value)"
 );
 
-const SCAN_BLOCKS = 100_000n; // ~14 hours on Arc
+const SCAN_BLOCKS = 5_000n; // ~42 min on Arc — keeps well within RPC range limits
 
 export interface WalletInteraction {
   address: string;
@@ -209,7 +209,12 @@ export function useWalletRisk(): WalletRiskState {
         topExposure,
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message.slice(0, 120) : "Analysis failed");
+      const msg = e instanceof Error ? e.message : "Analysis failed";
+      // Surface a clean message for common Arc RPC range errors
+      const clean = msg.includes("eth_getLogs") || msg.includes("block range") || msg.includes("too many")
+        ? "Arc RPC rejected the log range — try again (the scan window has been reduced to ~42 min of blocks)."
+        : msg.slice(0, 160);
+      setError(clean);
     } finally {
       setLoading(false);
     }

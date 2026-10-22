@@ -11,14 +11,13 @@ import { Sparkles, ExternalLink, CheckCircle, Loader, Image } from "lucide-react
 import { useWriteContract, useWaitForTransactionReceipt, useAccount, useSwitchChain } from "wagmi";
 import { ConnectKitButton } from "connectkit";
 import { toast } from "sonner";
-import { REGISTRY_CHAIN_ID, REGISTRY_EXPLORER } from "../lib/registry";
+import { RECEIPT_NFT_ADDRESS, RECEIPT_NFT_CHAIN_ID, RECEIPT_NFT_EXPLORER } from "../lib/registry";
 import { useGasEstimate } from "../hooks/useGasEstimate";
 import { GasPill } from "./GasPill";
 
-// Arc Testnet deployment. For Arc Mainnet, deploy ReceiptNFT.sol via Remix and update here.
-const NFT_ADDRESS = "0x53c0283587a2b2bb35cf150b926f6c9362f2adce" as const satisfies `0x${string}`;
-const NFT_CHAIN_ID = 5042002; // Arc Testnet
-const NFT_EXPLORER = "https://explorer.testnet.arc.io";
+const NFT_ADDRESS = RECEIPT_NFT_ADDRESS;
+const NFT_CHAIN_ID = RECEIPT_NFT_CHAIN_ID;
+const NFT_EXPLORER = RECEIPT_NFT_EXPLORER;
 
 const NFT_ABI = [
   {
@@ -108,7 +107,7 @@ export function MintReceiptNFT({ receiptHash, protocolName, riskLevel, riskScore
         </div>
         <div>
           <p className="text-sm font-semibold text-[var(--ink-2)]">Mint as Receipt NFT</p>
-          <p className="text-[10px] text-[var(--subtle)]">On-chain metadata · Arc Testnet · No IPFS</p>
+          <p className="text-[10px] text-[var(--subtle)]">On-chain metadata · {NFT_CHAIN_ID === 5042 ? "Arc Mainnet" : "Arc Testnet"} · No IPFS</p>
         </div>
       </div>
 
@@ -150,7 +149,7 @@ export function MintReceiptNFT({ receiptHash, protocolName, riskLevel, riskScore
           className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-yellow-400/15 border border-yellow-400/30 text-yellow-400 text-sm font-semibold hover:bg-yellow-400/25 transition-all disabled:opacity-50"
         >
           {isSwitching ? <Loader size={14} className="animate-spin" /> : null}
-          Switch to Arc Testnet
+          Switch to {NFT_CHAIN_ID === 5042 ? "Arc Mainnet" : "Arc Testnet"}
         </button>
       ) : isSuccess && txHash ? (
         <div className="flex flex-col items-center gap-2">
@@ -192,8 +191,9 @@ export function MintReceiptNFT({ receiptHash, protocolName, riskLevel, riskScore
       )}
 
       <p className="text-[9px] text-[var(--subtle)] text-center">
-        Arc Testnet · Contract: <a href={`${NFT_EXPLORER}/address/${NFT_ADDRESS}`} target="_blank" rel="noreferrer" className="text-[var(--accent)] hover:underline font-mono">{NFT_ADDRESS.slice(0, 10)}…</a>
-        {REGISTRY_CHAIN_ID === 5042 && " · For mainnet: deploy ReceiptNFT.sol via Remix to Arc Mainnet"}
+        {NFT_CHAIN_ID === 5042 ? "Arc Mainnet" : "Arc Testnet"} · Contract:{" "}
+        <a href={`${NFT_EXPLORER}/address/${NFT_ADDRESS}`} target="_blank" rel="noreferrer" className="text-[var(--accent)] hover:underline font-mono">{NFT_ADDRESS.slice(0, 10)}…</a>
+        {NFT_CHAIN_ID !== 5042 && " · Deploy ReceiptNFT.sol via Remix to Arc Mainnet to go live"}
       </p>
     </div>
   );

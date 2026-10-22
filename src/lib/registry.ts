@@ -1,9 +1,9 @@
 /**
- * Shared constants for the RiskReceiptRegistry contract.
- * Import from here — never inline the address or ABI elsewhere.
+ * Shared constants for the RiskReceiptRegistry and ReceiptNFT contracts.
+ * Import from here — never inline an address or ABI elsewhere.
  *
  * Set VITE_USE_MAINNET=true to point at Arc Mainnet.
- * The mainnet address is hardcoded below (deployed by the project owner).
+ * Mainnet addresses are hardcoded below (deployed by the project owner via Remix).
  */
 
 const isMainnet = import.meta.env.VITE_USE_MAINNET === 'true';
@@ -19,6 +19,22 @@ export const REGISTRY_ADDRESS: `0x${string}` = isMainnet ? MAINNET_ADDRESS : TES
 export const REGISTRY_CHAIN_ID: number = isMainnet ? 5042 : 5042002;
 
 export const REGISTRY_EXPLORER: string = isMainnet
+  ? "https://explorer.arc.io"
+  : "https://explorer.testnet.arc.io";
+
+// ReceiptNFT contract — open-mint ERC-721 with fully on-chain metadata.
+// Arc Testnet: deployed by Arc Studio.
+// Arc Mainnet: deploy contracts/ReceiptNFT.sol via Remix to Arc Mainnet (chain 5042),
+//              then replace RECEIPT_NFT_MAINNET_ADDRESS with the deployed address.
+const RECEIPT_NFT_TESTNET = "0x53c0283587a2b2bb35cf150b926f6c9362f2adce" as const satisfies `0x${string}`;
+const RECEIPT_NFT_MAINNET = "" as `0x${string}`; // TODO: paste Arc Mainnet address after Remix deploy
+
+export const RECEIPT_NFT_ADDRESS: `0x${string}` = isMainnet && RECEIPT_NFT_MAINNET
+  ? RECEIPT_NFT_MAINNET
+  : RECEIPT_NFT_TESTNET;
+
+export const RECEIPT_NFT_CHAIN_ID: number = isMainnet && RECEIPT_NFT_MAINNET ? 5042 : 5042002;
+export const RECEIPT_NFT_EXPLORER: string = isMainnet && RECEIPT_NFT_MAINNET
   ? "https://explorer.arc.io"
   : "https://explorer.testnet.arc.io";
 
