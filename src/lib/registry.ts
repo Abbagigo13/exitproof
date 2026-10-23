@@ -27,7 +27,7 @@ export const REGISTRY_EXPLORER: string = isMainnet
 // Arc Mainnet: deploy contracts/ReceiptNFT.sol via Remix to Arc Mainnet (chain 5042),
 //              then replace RECEIPT_NFT_MAINNET_ADDRESS with the deployed address.
 const RECEIPT_NFT_TESTNET = "0x53c0283587a2b2bb35cf150b926f6c9362f2adce" as const satisfies `0x${string}`;
-const RECEIPT_NFT_MAINNET = "" as `0x${string}`; // TODO: paste Arc Mainnet address after Remix deploy
+const RECEIPT_NFT_MAINNET = "0xf107Eb78AC34a4D51493425Af7473d1B29c9053C" as const satisfies `0x${string}`;
 
 export const RECEIPT_NFT_ADDRESS: `0x${string}` = isMainnet && RECEIPT_NFT_MAINNET
   ? RECEIPT_NFT_MAINNET

@@ -17,6 +17,7 @@ DeFi risk intelligence dashboard. Users select a protocol, view composite risk s
 | RiskReceiptRegistry | Arc Mainnet | 0xcd8E285b61437EE0AfDdbD5EBA54c1A3ea6FBFb6 | [view](https://explorer.arc.io/address/0xcd8E285b61437EE0AfDdbD5EBA54c1A3ea6FBFb6) |
 | RiskReceiptRegistry | Arc Testnet | 0xf9394055a418cf0cf606c11c928d992bb1c55536 | [view](https://explorer.testnet.arc.io/address/0xf9394055a418cf0cf606c11c928d992bb1c55536) |
 | ReceiptNFT | Arc Testnet | 0x53c0283587a2b2bb35cf150b926f6c9362f2adce | [view](https://explorer.testnet.arc.io/address/0x53c0283587a2b2bb35cf150b926f6c9362f2adce) |
+| ReceiptNFT | Arc Mainnet | 0xf107Eb78AC34a4D51493425Af7473d1B29c9053C | [view](https://explorer.arc.io/address/0xf107Eb78AC34a4D51493425Af7473d1B29c9053C) |
 
 ## Tech Stack
 
