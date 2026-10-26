@@ -98,9 +98,9 @@ export default function WalletRiskPage() {
               How exposed is your Arc portfolio?
             </h2>
             <p className="text-xs text-[var(--muted)] leading-relaxed text-pretty">
-              Enter any Arc Mainnet address. ExitProof scans its USDC transfer history on Arc,
-              cross-references known DeFi protocol contracts, and computes a weighted portfolio
-              risk score — no external API, pure Arc RPC.
+              Enter any Arc Mainnet address. ExitProof reads its USDC balance, transaction count,
+              and receipt anchor history directly from Arc — no external API, pure Arc RPC.
+              USDC transfer patterns are cross-referenced with known protocol contracts where available.
             </p>
           </div>
         </div>
@@ -246,14 +246,18 @@ export default function WalletRiskPage() {
             )}
 
             {result.interactions.length === 0 && (
-              <div className="rounded-2xl border border-white/8 bg-white/4 p-8 text-center flex flex-col items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-                  <Search size={16} className="text-[var(--subtle)]" />
+              <div className="rounded-2xl border border-white/8 bg-white/4 p-5 flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <Search size={14} className="text-[var(--subtle)] shrink-0" />
+                  <p className="text-sm font-semibold text-[var(--ink-2)]">No mapped DeFi interactions</p>
                 </div>
-                <p className="text-sm font-semibold text-[var(--ink-2)]">No USDC interactions found</p>
-                <p className="text-xs text-[var(--subtle)] max-w-xs text-pretty">
-                  No outbound USDC transfers from this address in the last 100,000 blocks (~14 hours).
-                  Try a wallet that has been active on Arc recently.
+                <p className="text-xs text-[var(--muted)] leading-relaxed text-pretty">
+                  No outbound USDC transfers to known DeFi protocol contracts were found in the last 5,000 blocks.
+                  Arc is a new chain — the contract registry will grow as more protocols deploy here.
+                  The stats above (balance, tx count, anchors) are always accurate regardless.
+                </p>
+                <p className="text-[10px] text-[var(--subtle)]">
+                  Portfolio risk defaults to <span className="font-bold">50 / Moderate</span> when no interactions are mapped.
                 </p>
               </div>
             )}
@@ -282,7 +286,7 @@ export default function WalletRiskPage() {
             <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl border border-white/6 bg-white/3">
               <Hash size={11} className="text-[var(--subtle)] mt-0.5 shrink-0" />
               <p className="text-[10px] text-[var(--subtle)] leading-relaxed">
-                Scanning last 100,000 blocks only. Unknown contracts assigned moderate (50) risk.
+                Scanning last 5,000 blocks only. Unknown contracts assigned moderate (50) risk.
                 Portfolio score is informational — not financial advice or a security audit.
               </p>
             </div>

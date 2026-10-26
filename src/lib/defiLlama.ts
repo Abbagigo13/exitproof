@@ -178,10 +178,26 @@ export interface DefiLlamaResult {
   error?: string;
 }
 
+async function fetchWithRetry(url: string, timeoutMs: number, retries: number): Promise<Response> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+      if (res.ok) return res;
+      throw new Error(`HTTP ${res.status}`);
+    } catch (e) {
+      lastErr = e;
+      if (attempt < retries) {
+        await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)));
+      }
+    }
+  }
+  throw lastErr;
+}
+
 export async function fetchTopProtocols(count = 50): Promise<DefiLlamaResult> {
   try {
-    const res = await fetch(LLAMA_API, { signal: AbortSignal.timeout(8000) });
-    if (!res.ok) throw new Error(`DefiLlama returned ${res.status}`);
+    const res = await fetchWithRetry(LLAMA_API, 12000, 3);
     const all = (await res.json()) as unknown as LlamaProtocol[];
 
     // Filter: must have TVL > $1M, a known category, not a CEX or Chain

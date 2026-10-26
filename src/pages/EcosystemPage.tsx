@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Zap, Database, TrendingUp, Globe, ExternalLink, RefreshCw, Loader, Radio, ShieldCheck, Hash } from "lucide-react";
+import { ArrowLeft, Zap, Database, TrendingUp, Globe, ExternalLink, RefreshCw, Loader, Radio, ShieldCheck, Hash, Blocks } from "lucide-react";
 import { AppShell } from "../components/AppShell";
 import { useReceiptFeed } from "../hooks/useReceiptFeed";
+import { useArcBlock } from "../hooks/useArcBlock";
 import { REGISTRY_EXPLORER, REGISTRY_ADDRESS } from "../lib/registry";
 
 interface ArcStats {
@@ -73,6 +74,7 @@ const STAT_CARDS = (s: ArcStats) => [
 export default function EcosystemPage() {
   const navigate = useNavigate();
   const feed = useReceiptFeed();
+  const { block: liveBlock, tps } = useArcBlock();
   const [stats, setStats] = useState<ArcStats | null>(null);
   const [protocols, setProtocols] = useState<ArcProtocol[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,7 +101,7 @@ export default function EcosystemPage() {
     <AppShell>
       <div className="max-w-5xl mx-auto px-4 py-8 flex flex-col gap-8">
         {/* Back + header */}
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
             <button
               onClick={() => { void navigate("/dashboard"); }}
@@ -110,14 +112,26 @@ export default function EcosystemPage() {
             <span className="text-[var(--subtle)]/40">/</span>
             <h1 className="display font-bold text-[var(--ink)] text-lg tracking-tight">Arc Ecosystem</h1>
           </div>
-          <button
-            onClick={() => { void load(); }}
-            disabled={loading}
-            className="flex items-center gap-1.5 text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] disabled:opacity-40 transition-opacity"
-          >
-            <RefreshCw size={11} className={loading ? "animate-spin" : ""} />
-            Refresh
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Live block counter */}
+            {liveBlock !== null && (
+              <div className="flex items-center gap-1.5 text-[10px] font-mono text-[var(--accent)] bg-[var(--accent)]/8 border border-[var(--accent)]/20 px-2.5 py-1.5 rounded-lg">
+                <Blocks size={10} className="shrink-0" />
+                <span className="tabular-nums">#{liveBlock.toLocaleString()}</span>
+                {tps !== null && (
+                  <span className="text-[var(--subtle)] ml-1">{tps} blk/s</span>
+                )}
+              </div>
+            )}
+            <button
+              onClick={() => { void load(); }}
+              disabled={loading}
+              className="flex items-center gap-1.5 text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] disabled:opacity-40 transition-opacity"
+            >
+              <RefreshCw size={11} className={loading ? "animate-spin" : ""} />
+              Refresh
+            </button>
+          </div>
         </div>
 
         {/* Arc identity banner */}

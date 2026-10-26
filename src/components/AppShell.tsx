@@ -1,8 +1,11 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Shield, BarChart3, Globe, GitCompare, Activity, Wallet, TrendingUp, Bell } from "lucide-react";
 import { ConnectKitButton } from "connectkit";
-import { useAccount } from "wagmi";
+import { useAccount, useSwitchChain } from "wagmi";
 import { AIAssistant } from "./AIAssistant";
+
+const EXPECTED_CHAIN_ID = import.meta.env.VITE_USE_MAINNET === "true" ? 5042 : 5042002;
+const EXPECTED_CHAIN_NAME = import.meta.env.VITE_USE_MAINNET === "true" ? "Arc Mainnet" : "Arc Testnet";
 
 const NAV = [
   { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
@@ -17,6 +20,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { isConnected, chainId } = useAccount();
+  const { switchChain } = useSwitchChain();
+
+  const isCorrectChain = chainId === EXPECTED_CHAIN_ID;
+  const isOtherArc = chainId === 5042 || chainId === 5042002;
+  const networkLabel = isCorrectChain
+    ? EXPECTED_CHAIN_NAME
+    : isOtherArc
+    ? (chainId === 5042 ? "Arc Mainnet" : "Arc Testnet")
+    : "Wrong network";
+  const networkStyle = isCorrectChain
+    ? "bg-[var(--success)]/10 border-[var(--success)]/30 text-[var(--success)]"
+    : isOtherArc
+    ? "bg-yellow-400/10 border-yellow-400/30 text-yellow-400 cursor-pointer hover:bg-yellow-400/20"
+    : "bg-[var(--danger)]/10 border-[var(--danger)]/30 text-[var(--danger)] cursor-pointer hover:bg-[var(--danger)]/20";
 
   return (
     <div className="min-h-dvh flex flex-col" style={{ background: "var(--bg-gradient)" }}>
@@ -61,15 +78,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {/* Right: network badge + wallet */}
           <div className="flex items-center gap-2">
             {isConnected && (
-              <span className={`hidden sm:flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full border font-semibold ${
-                chainId === 5042
-                  ? "bg-[var(--success)]/10 border-[var(--success)]/30 text-[var(--success)]"
-                  : chainId === 5042002
-                  ? "bg-yellow-400/10 border-yellow-400/30 text-yellow-400"
-                  : "bg-[var(--danger)]/10 border-[var(--danger)]/30 text-[var(--danger)]"
-              }`}>
+              <span
+                className={`hidden sm:flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full border font-semibold transition-all ${networkStyle}`}
+                onClick={() => { if (!isCorrectChain) switchChain({ chainId: EXPECTED_CHAIN_ID }); }}
+                title={isCorrectChain ? undefined : `Click to switch to ${EXPECTED_CHAIN_NAME}`}
+              >
                 <Activity size={8} />
-                {chainId === 5042 ? "Arc Mainnet" : chainId === 5042002 ? "Arc Testnet" : "Wrong network"}
+                {networkLabel}
               </span>
             )}
             <ConnectKitButton />
