@@ -12,7 +12,7 @@ import { createPublicClient, http, parseAbiItem } from "viem";
 import { requireChain } from "@/onchain-facts";
 import { REGISTRY_ADDRESS, REGISTRY_CHAIN_ID } from "../lib/registry";
 
-const LOOKBACK_BLOCKS = 50_000n;
+const LOOKBACK_BLOCKS = 5_000n;  // Arc Mainnet RPC rejects ranges > ~10k blocks
 const POLL_INTERVAL_MS = 10_000;
 const MAX_EVENTS = 50;
 
@@ -120,7 +120,11 @@ export function useReceiptFeed(): ReceiptFeedState {
 
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      setError(msg.slice(0, 100));
+      // Suppress noisy RPC range errors — just retry silently on next poll
+      const isRangeError = msg.includes("eth_getLogs") || msg.includes("block range") ||
+        msg.includes("too many") || msg.includes("limit") || msg.includes("Request failed");
+      if (!isRangeError) setError(msg.slice(0, 100));
+      // On range errors keep any events we already have, don't clear the feed
     } finally {
       setLoading(false);
     }

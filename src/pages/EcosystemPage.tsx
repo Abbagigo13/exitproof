@@ -262,8 +262,8 @@ export default function EcosystemPage() {
           </div>
 
           {feed.error && (
-            <div className="rounded-xl border border-[var(--danger)]/25 bg-[var(--danger)]/8 px-3 py-2 text-xs text-[var(--danger)] mb-3">
-              {feed.error} — retrying every 10s
+            <div className="rounded-xl border border-white/8 bg-white/3 px-3 py-2 text-[10px] text-[var(--subtle)] mb-3">
+              Retrying… {feed.error}
             </div>
           )}
 
@@ -280,7 +280,7 @@ export default function EcosystemPage() {
               <div>
                 <p className="text-sm font-semibold text-[var(--ink-2)]">Listening for receipts…</p>
                 <p className="text-xs text-[var(--subtle)] mt-0.5">
-                  No anchors found in the last 50,000 blocks. Be the first — anchor a risk receipt from the Dashboard.
+                  No anchors found in the last 5,000 blocks. Be the first — anchor a risk receipt from the Dashboard.
                 </p>
               </div>
             </div>
