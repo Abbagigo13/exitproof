@@ -81,9 +81,49 @@ const KB: Array<{ patterns: string[]; answer: string }> = [
       "Every protocol has a Share button in the breadcrumb that copies a direct URL (?protocol=<id>). The Receipt tab has a 'Share snapshot' button that encodes the full receipt data into a base64 URL — anyone with the link sees a read-only snapshot card with the risk scores and SHA-256 hash, with no server required.",
   },
   {
+    patterns: ["wallet risk", "wallet score", "portfolio risk", "arc wallet", "analyze wallet"],
+    answer:
+      "The Wallet Risk page (in the nav) lets you paste any Arc Mainnet address and instantly see:\n• USDC balance — read directly from the Arc RPC\n• Transaction count — from eth_getTransactionCount\n• Portfolio risk score — weighted by USDC transfer volume to known DeFi contracts\n• Receipt anchor count — how many risk receipts that wallet has anchored on-chain\n\nArc is a new chain so the DeFi contract registry is small — the balance and tx count are always accurate even if no DeFi interactions are mapped.",
+  },
+  {
+    patterns: ["yield risk", "usdc yield", "yield dashboard", "risk-adjusted yield", "safe yield"],
+    answer:
+      "The Yield Risk page ranks all 50 protocols by risk-adjusted USDC yield. It estimates a gross APY by category (e.g. Lending ~8%, DEX ~12%), then scales it down by the composite risk score so higher-risk protocols show a lower adjusted yield. You can sort by adjusted yield, yield-to-risk ratio (bang for buck), safety (lowest risk first), TVL, or name. No token price conversion — everything is in USDC terms.",
+  },
+  {
+    patterns: ["watchlist", "watch protocol", "alert", "threshold", "usdc signal"],
+    answer:
+      "The Watchlist page lets you bookmark protocols and set a risk-score threshold (drag the slider). When the score crosses your threshold, a red ALERT badge fires. Connected wallets can also send a 0.001 USDC on-chain self-signal — a pay-to-alert pattern that only works on Arc because gas is USDC. The signal lands permanently on-chain as proof of the alert moment.",
+  },
+  {
+    patterns: ["my receipts", "my anchors", "my nfts", "receipt history", "view receipts"],
+    answer:
+      "The My Receipts page shows everything you have anchored on Arc Mainnet. Connect your wallet and it reads your receipt hashes directly from the RiskReceiptRegistry contract using getReceiptsByAnchorer(), then fetches each receipt's metadata. It also shows any Receipt NFTs you have minted. Everything is read from Arc — no server, no database.",
+  },
+  {
+    patterns: ["nft", "mint nft", "receipt nft", "eprx", "nft metadata"],
+    answer:
+      "After computing a receipt hash in the Receipt tab, you can mint it as an ERC-721 NFT on Arc Mainnet. The ReceiptNFT contract stores all metadata fully on-chain as a base64-encoded JSON data URI — no IPFS, no server needed. The token includes the protocol name, risk score, risk level, and receipt hash as attributes. Contract: 0xf107Eb78AC34a4D51493425Af7473d1B29c9053C on Arc Mainnet.",
+  },
+  {
+    patterns: ["block counter", "block number", "live block", "finality", "blocks per second"],
+    answer:
+      "The Arc Ecosystem page shows a live block counter that updates every 500ms — you can watch Arc Mainnet blocks tick up in real time. This directly demonstrates Arc's sub-second finality (~2 blocks per second). The counter reads eth_blockNumber directly from the Arc RPC with no middleman.",
+  },
+  {
+    patterns: ["ecosystem", "arc ecosystem page", "arc stats", "arc tvl", "arc protocols"],
+    answer:
+      "The Arc Ecosystem page shows: live Arc chain TVL from DefiLlama, block time, gas fee, and a list of protocols deployed on Arc. It also has a Live Receipt Feed that polls the RiskReceiptRegistry for ReceiptAnchored events every 10 seconds — showing who anchored what, when. At the top, a live block counter shows Arc's sub-second finality in real time.",
+  },
+  {
+    patterns: ["compare", "comparison page", "compare protocols", "side by side"],
+    answer:
+      "The Compare page shows two protocols side-by-side. Pick any two from the dropdowns — each column shows the composite risk gauge, all five factor bars with weights, warnings, and key stats. Great for deciding between two protocols before deploying capital.",
+  },
+  {
     patterns: ["hello", "hi", "hey", "help", "what can you do"],
     answer:
-      "Hi! I'm ExitProof's guide. I can explain:\n• How risk scores are calculated\n• What each of the five risk factors means\n• How risk receipts and on-chain anchoring work\n• What the Exit Stress simulator and What-If Lab do\n• How Arc Mainnet and USDC gas work\n• How to use the premium features\n\nJust ask me anything about the app!",
+      "Hi! I'm ExitProof's AI guide. I can explain:\n• Risk scores and the five factors\n• Risk receipts and on-chain anchoring\n• Exit Stress simulator and What-If Lab\n• Arc Mainnet, USDC gas, and the live block counter\n• Wallet Risk Score and portfolio analysis\n• Yield Risk dashboard\n• Watchlist and USDC alerts\n• My Receipts page\n• Receipt NFT minting\n• Premium features\n\nJust ask!",
   },
 ];
 
@@ -103,7 +143,8 @@ const SUGGESTIONS = [
   "How are risk scores calculated?",
   "What is a risk receipt?",
   "How does Arc Mainnet work?",
-  "What does the Exit Stress simulator do?",
+  "What is the Wallet Risk Score?",
+  "What does the Yield Risk page show?",
 ];
 
 export function AIAssistant() {

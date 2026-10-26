@@ -6,6 +6,7 @@ import EcosystemPage from "./pages/EcosystemPage";
 import WalletRiskPage from "./pages/WalletRiskPage";
 import YieldRiskPage from "./pages/YieldRiskPage";
 import WatchlistPage from "./pages/WatchlistPage";
+import MyReceiptsPage from "./pages/MyReceiptsPage";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
       <Route path="/wallet" element={<WalletRiskPage />} />
       <Route path="/yield" element={<YieldRiskPage />} />
       <Route path="/watchlist" element={<WatchlistPage />} />
+      <Route path="/my-receipts" element={<MyReceiptsPage />} />
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
