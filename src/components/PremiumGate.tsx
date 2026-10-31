@@ -1,6 +1,6 @@
 /**
- * PremiumGate — wraps any content behind a 1 USDC paywall.
- * On Arc Testnet the user pays 1 USDC (ERC-20 transfer) to the treasury.
+ * PremiumGate — wraps any content behind a 0.1 USDC paywall.
+ * On Arc Mainnet the user pays 0.1 USDC (ERC-20 transfer) to the treasury.
  * Once the transaction is confirmed, the content is revealed and access is
  * persisted in localStorage for this wallet + protocol combination.
  */
@@ -181,9 +181,9 @@ export function PremiumGate({ protocolId, protocolName, featureLabel, children }
           </div>
         )}
 
-        {TARGET_CHAIN_ID !== 5042 && (
+        {TARGET_CHAIN_ID === 5042002 && (
           <p className="text-[9px] text-[var(--subtle)]">
-            Testnet demo — no real funds. Get test USDC from the sidebar.
+            Testnet mode — no real funds. Get test USDC from the sidebar.
           </p>
         )}
       </div>

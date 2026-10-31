@@ -72,7 +72,7 @@ export function AnchorPanel({ hash, protocolId, onAnchored }: Props) {
     return (
       <div className="flex flex-col items-center gap-3 p-4">
         <p className="text-sm text-[var(--muted)] text-center">
-          Connect your wallet to anchor this receipt on Arc Testnet.
+          Connect your wallet to anchor this receipt on Arc Mainnet.
         </p>
         <ConnectKitButton />
       </div>

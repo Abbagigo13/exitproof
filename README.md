@@ -51,7 +51,7 @@ ExitProof is an open, client-side DeFi risk intelligence platform that:
 - **Fetches live data** from DefiLlama (TVL, category, audit count, chain distribution) and derives transparent, reproducible risk scores across five axes: smart contract risk, liquidity risk, governance risk, oracle risk, and counterparty risk
 - **Shows the reasoning**: every score is backed by visible evidence — audits, exploit history, oracle configuration, governance structure — not a single opaque number
 - **Issues risk receipts**: a JSON snapshot of the full risk assessment at a point in time, with a SHA-256 hash you can verify independently
-- **Anchors that hash on-chain**: one transaction on Arc Testnet writes the receipt hash to `RiskReceiptRegistry` — an immutable, timestamped, publicly verifiable record of what the assessment said and when
+- **Anchors that hash on-chain**: one transaction on Arc Mainnet writes the receipt hash to `RiskReceiptRegistry` — an immutable, timestamped, publicly verifiable record of what the assessment said and when
 - **Lets anyone verify**: the Verify tab reads the on-chain receipt directly — paste any hash and see who anchored it, when, and for which protocol
 
 The result: risk assessments that are transparent about their methodology, immutable after they are published, and verifiable by anyone without trusting the platform.
@@ -89,7 +89,7 @@ The result: risk assessments that are transparent about their methodology, immut
 ```
 Browser (React + Vite)
   ├── DefiLlama API           → live TVL / category / chain / audit data
-  ├── Arc Testnet RPC         → read/write RiskReceiptRegistry
+  ├── Arc Mainnet RPC         → read/write RiskReceiptRegistry
   ├── wagmi v2 + ConnectKit   → wallet connection & signing
   └── URL params              → shareable protocol & receipt links
 ```

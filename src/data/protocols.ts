@@ -68,7 +68,7 @@ export const PROTOCOLS: Protocol[] = [
     name: "StableSwap V2",
     category: "AMM / Stablecoin Pool",
     tvl: "$142M",
-    chain: "Arc Testnet",
+    chain: "Arc",
     lastChecked: "2026-10-18",
     description:
       "A two-pool stablecoin AMM with admin-upgradeable logic. High TVL but several centralization controls remain active.",
@@ -139,7 +139,7 @@ export const PROTOCOLS: Protocol[] = [
     name: "LendingArc",
     category: "Lending Protocol",
     tvl: "$87M",
-    chain: "Arc Testnet",
+    chain: "Arc",
     lastChecked: "2026-10-17",
     description:
       "An over-collateralised lending market with liquidation bots. Governance uses a 48-hour timelock. Source code fully verified.",
@@ -211,7 +211,7 @@ export const PROTOCOLS: Protocol[] = [
     name: "YieldVault-X",
     category: "Yield Aggregator",
     tvl: "$23M",
-    chain: "Arc Testnet",
+    chain: "Arc",
     lastChecked: "2026-10-15",
     description:
       "An auto-compounding vault with unverified strategy contracts. High concentration among early depositors.",

@@ -8,7 +8,7 @@ This is the **project memory** - what Arc Studio remembers about building this a
 
 ## What This App Does
 
-DeFi risk intelligence dashboard. Users select a protocol, view composite risk scores across five factors, simulate exit stress and what-if scenarios, inspect evidence, generate a signed risk receipt, and anchor that receipt hash on Arc Testnet via the RiskReceiptRegistry contract.
+DeFi risk intelligence dashboard. Users select a protocol, view composite risk scores across five factors, simulate exit stress and what-if scenarios, inspect evidence, generate a signed risk receipt, and anchor that receipt hash on Arc Mainnet via the RiskReceiptRegistry contract.
 
 ## Deployed Contracts
 
@@ -25,8 +25,8 @@ DeFi risk intelligence dashboard. Users select a protocol, view composite risk s
 - Web3: wagmi v2, viem v2, ConnectKit
 - Contracts: Solidity 0.8.28 + Foundry. Sources in `contracts/`, unit tests in `contracts/test/*.t.sol`. Build with `bun run contracts:build` (`forge build`), test with `bun run contracts:test` (`forge test`).
 - Wallet: injected (MetaMask, etc.)
-- Chain: Arc Testnet (Chain ID: 5042002, imported from `viem/chains`)
-- Token: USDC (6 decimals) (Address: 0x3600000000000000000000000000000000000000, Chain: Arc Testnet)
+- Chain: Arc Mainnet (Chain ID: 5042) when VITE_USE_MAINNET=true; Arc Testnet (5042002) for local dev
+- Token: USDC (6 decimals) (Address: 0x3600000000000000000000000000000000000000, both chains)
 - Toasts: Sonner
 
 ## Key Files
