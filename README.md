@@ -1,6 +1,34 @@
 # ExitProof — DeFi Risk Intelligence Platform
 
-> Transparent, verifiable risk analysis for DeFi protocols — anchored on-chain so the data can never be quietly revised.
+> Transparent, verifiable risk analysis for DeFi protocols — anchored on Arc Mainnet so the data can never be quietly revised.
+
+**Live app:** https://exitproof-gules.vercel.app
+
+---
+
+## Try It Now (Judge Guide)
+
+The fastest way to see everything working end-to-end:
+
+1. **Open the app** — go to https://exitproof-gules.vercel.app and click **Enter ExitProof**
+2. **Browse protocols** — the dashboard loads 50+ live protocols from DefiLlama with real TVL and risk scores. Click any card to open it.
+3. **Run an exit stress test** — in the protocol detail, open the **Exit Stress** tab and run a scenario. See slippage and time-to-exit estimates.
+4. **Generate a risk receipt** — open the **Receipt** tab, click **Compute SHA-256**. A tamper-proof hash of the full assessment appears.
+5. **Anchor it on Arc Mainnet** — connect MetaMask (Arc Mainnet, chain ID 5042, RPC `https://rpc.mainnet.arc.io`). Click **Anchor this hash on Arc Mainnet**, confirm the transaction. Gas is paid in USDC.
+6. **Verify it on-chain** — click the explorer link in the confirmation, or go to the **Verify** tab and paste the hash. The contract returns who anchored it, when, and for which protocol.
+7. **Mint a Receipt NFT** — still in the Receipt tab, click **Mint Receipt NFT**. This calls the ReceiptNFT contract on Arc Mainnet and mints an ERC-721 with fully on-chain metadata (no IPFS).
+8. **See your receipts** — click **My Receipts** in the nav. Your anchored receipts and minted NFTs appear here, read directly from the Arc RPC.
+9. **Watch the live feed** — go to **Arc Ecosystem**. The live receipt feed shows your anchor appearing in real time. The block counter in the header ticks every ~500ms, proving Arc's sub-second finality.
+10. **Try the AI guide** — click the sparkle button (bottom-right). Ask "How are risk scores calculated?" or "What is a risk receipt?"
+
+**No account needed. No ETH needed. Gas is USDC.**
+
+### Deployed contracts on Arc Mainnet
+
+| Contract | Address | Explorer |
+|---|---|---|
+| RiskReceiptRegistry | `0xcd8E285b61437EE0AfDdbD5EBA54c1A3ea6FBFb6` | [view](https://explorer.arc.io/address/0xcd8E285b61437EE0AfDdbD5EBA54c1A3ea6FBFb6) |
+| ReceiptNFT | `0xf107Eb78AC34a4D51493425Af7473d1B29c9053C` | [view](https://explorer.arc.io/address/0xf107Eb78AC34a4D51493425Af7473d1B29c9053C) |
 
 ---
 
@@ -41,10 +69,18 @@ The result: risk assessments that are transparent about their methodology, immut
 | What-If Lab | Adjust TVL, audit count, chain concentration and see score change in real time |
 | Evidence register | Per-factor evidence items with citations |
 | Risk receipt | JSON export + SHA-256 hash of the full assessment snapshot |
-| On-chain anchoring | Write the receipt hash to `RiskReceiptRegistry` on Arc Testnet |
+| On-chain anchoring | Write the receipt hash to `RiskReceiptRegistry` on Arc Mainnet |
+| Receipt NFT mint | Mint an ERC-721 with fully on-chain metadata via `ReceiptNFT` on Arc Mainnet |
 | Receipt verification | Look up any hash on-chain: anchorer, timestamp, protocol reference |
-| Premium features | 1 USDC unlocks the full evidence register and verified receipt badge |
+| Premium features | 0.1 USDC unlocks the full evidence register and verified receipt badge |
 | Shareable links | `?protocol=<id>` links and `?receipt=<b64>` self-contained snapshot URLs |
+| Compare page | Side-by-side risk comparison of any two protocols |
+| Yield Risk page | 50 protocols ranked by risk-adjusted USDC yield estimate |
+| Wallet Risk page | Portfolio risk score for any Arc address, read from Arc RPC |
+| Watchlist | Bookmark protocols with threshold alerts and USDC on-chain signals |
+| My Receipts | All your anchored receipts and minted NFTs, read from Arc RPC |
+| Arc Ecosystem page | Live block counter, live receipt feed, Arc chain facts |
+| AI guide | Floating assistant answering questions about the app and risk methodology |
 
 ---
 
@@ -64,19 +100,28 @@ See [docs/1.architecture.md](docs/1.architecture.md) for a full breakdown.
 
 ---
 
-## Smart Contract
+## Smart Contracts
 
-`RiskReceiptRegistry` — deployed on **Arc Testnet**
+Both contracts are deployed on **Arc Mainnet** (chain ID 5042). Gas is paid in USDC.
 
-- Address: `0xf9394055a418cf0cf606c11c928d992bb1c55536`
-- [View on explorer](https://explorer.testnet.arc.io/address/0xf9394055a418cf0cf606c11c928d992bb1c55536)
+### RiskReceiptRegistry
+- Address: `0xcd8E285b61437EE0AfDdbD5EBA54c1A3ea6FBFb6`
+- [View on explorer](https://explorer.arc.io/address/0xcd8E285b61437EE0AfDdbD5EBA54c1A3ea6FBFb6)
 
 ```solidity
-// Anchor a receipt hash (permissionless, one per hash)
-function anchorReceipt(bytes32 hash, string calldata protocolRef) external
+function anchorReceipt(bytes32 receiptHash, string calldata protocolRef) external
+function getReceipt(bytes32 receiptHash) external view returns (address anchorer, uint256 timestamp, string memory protocolRef, bool revoked)
+function totalReceipts() external view returns (uint256)
+```
 
-// Verify: returns (anchorer, timestamp, protocolRef)
-function getReceipt(bytes32 hash) external view returns (address, uint256, string memory)
+### ReceiptNFT
+- Address: `0xf107Eb78AC34a4D51493425Af7473d1B29c9053C`
+- [View on explorer](https://explorer.arc.io/address/0xf107Eb78AC34a4D51493425Af7473d1B29c9053C)
+- Open mint, no fee, fully on-chain metadata (data URI, no IPFS)
+
+```solidity
+function mint(bytes32 receiptHash, string calldata protocolRef, string calldata riskLevel, uint256 riskScore) external
+function tokenURI(uint256 tokenId) public view returns (string memory) // returns data:application/json;base64,...
 ```
 
 ---
@@ -87,17 +132,17 @@ function getReceipt(bytes32 hash) external view returns (address, uint256, strin
 
 - [Bun](https://bun.sh) v1.0+
 - [Foundry](https://book.getfoundry.sh) (for contract work)
-- A browser wallet (MetaMask or equivalent) connected to Arc Testnet
+- A browser wallet (MetaMask or equivalent) connected to Arc Mainnet
 
-### Arc Testnet Network Details
+### Arc Mainnet Network Details
 
 | Field | Value |
 |---|---|
-| Network name | Arc Testnet |
-| Chain ID | 5042002 |
-| RPC URL | `https://rpc.testnet.arc.io` |
+| Network name | Arc |
+| Chain ID | 5042 |
+| RPC URL | `https://rpc.mainnet.arc.io` |
 | Currency symbol | USDC |
-| Block explorer | `https://explorer.testnet.arc.io` |
+| Block explorer | `https://explorer.arc.io` |
 
 ### Run Locally
 
@@ -145,7 +190,7 @@ bun run contracts:deploy
 | Styling | Tailwind CSS, framer-motion |
 | Web3 | wagmi v2, viem v2, ConnectKit |
 | Contracts | Solidity 0.8.28, Foundry |
-| Chain | Arc Testnet (USDC as native gas) |
+| Chain | Arc Mainnet (USDC as native gas, chain ID 5042) |
 | Data | DefiLlama public API |
 
 ---
